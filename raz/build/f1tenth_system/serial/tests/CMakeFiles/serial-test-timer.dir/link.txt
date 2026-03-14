@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/serial-test-timer.dir/unit/unix_timer_tests.cc.o  -o /home/raz/raz/devel/lib/serial/serial-test-timer   -L/home/raz/raz/build/gtest  -Wl,-rpath,/home/raz/raz/build/gtest:/home/raz/raz/build/gtest/lib:/home/raz/raz/devel/lib ../../../gtest/lib/libgtest.so /home/raz/raz/devel/lib/libserial.so -lpthread -lrt -lpthread 

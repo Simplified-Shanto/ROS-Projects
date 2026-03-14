@@ -1,0 +1,13 @@
+local_costmap:
+  global_frame : odom
+  robot_base_frame : base_link
+  update_frequency: 7
+  publish_frequency: 7
+  static_map: false
+  rolling_window: true
+  width: 10
+  height: 10
+  resolution: 0.02
+  transform_tolerance: 0.5
+  planner_frequency: 3
+  planner_patiente: 5.0

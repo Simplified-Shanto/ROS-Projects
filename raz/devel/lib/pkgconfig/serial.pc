@@ -1,0 +1,8 @@
+prefix=/home/raz/raz/devel
+
+Name: serial
+Description: Description of serial
+Version: 1.2.1
+Cflags: -I/home/raz/raz/src/f1tenth_system/serial/include
+Libs: -L${prefix}/lib -lserial -lrt -lpthread
+Requires: 

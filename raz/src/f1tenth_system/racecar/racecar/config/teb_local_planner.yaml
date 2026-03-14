@@ -1,0 +1,69 @@
+move_base/TEBLocalPlannerROS:
+  # Set the robot's footprint
+  footprint_model: "circle"  # You can use "circle" or "polygon" depending on your robot's shape
+  robot_radius: 0.35  # The radius of the robot (if using a circle model)
+
+  # Timed Elastic Band (TEB) parameters
+  # Maximum time in seconds for the planner to run
+  max_timesteps: 200
+  teb_autosize: true
+  max_duration: 2.0  # Maximum time for the planner to execute
+  
+  # Optimization settings
+  # Weights for optimization, affecting trajectory smoothness, distance to obstacles, etc.
+  weight_optimizing:
+    weight_trajectory: 1.0  # Weight for trajectory smoothness
+    weight_obstacle: 10.0   # Weight for avoiding obstacles
+    weight_dynamic_obstacle: 5.0 # Weight for avoiding moving obstacles
+    weight_viapoint: 0.0  # Weight for passing through via points
+    weight_time: 0.5      # Weight for time/velocity optimization
+
+  # Parameters controlling the quality of the generated trajectory
+  min_obstacle_dist: 0.1     # Minimum distance to obstacles
+  min_robot_dist: 0.1        # Minimum distance between the robot and obstacles
+  
+  # Time penalty for staying close to obstacles
+  weight_no_inner_iterations: 1.0  # Weight for optimization cost of inner iterations
+
+  # Robot velocity constraints
+  max_vel_x: 40       # Maximum linear velocity in m/s
+  max_vel_y: 0       # Maximum lateral velocity (robot typically does not move sideways)
+  max_vel_theta: 1.0    # Maximum angular velocity in rad/s
+  
+  # Acceleration limits
+  acc_lim_x: 2.0        # Linear acceleration limit in m/s²
+  acc_lim_y: 0.0        # Lateral acceleration limit (typically 0 for differential drive robots)
+  acc_lim_theta: 1.0    # Angular acceleration limit in rad/s²
+  
+  # Goal tolerance
+  yaw_goal_tolerance: 0.1      # Tolerance for goal orientation in radians
+  xy_goal_tolerance: 0.2       # Tolerance for goal position in meters
+
+  # Obstacle cost function settings
+  obstacle_cost_factor: 5.0    # Scaling factor for obstacle cost (higher = more aggressive avoidance)
+  
+  # Trajectory constraints
+  teb_min_ratio: 0.1           # Minimum ratio between time and cost for trajectory optimization
+
+  # Optimization horizon parameters
+  horizon_reach: 4.0  # Lookahead distance in meters
+  horizon_angular_reach: 2.0  # Lookahead angular distance (used in robot's rotation)
+  
+  # Stopping criteria
+  stop_time_buffer: 0.2     # Time buffer before stopping
+  final_time_to_arrive: 1.0  # Time to reach the final destination (before stopping)
+
+  # Path smoothing parameters
+  path_smoothing: true  # If true, the planner will smooth the trajectory
+
+  # Whether to allow the planner to make the robot rotate in place
+  allow_replanning: true  # Allow re-planning if the path becomes invalid
+  
+  # Dynamic obstacles (e.g., moving objects)
+  dynamic_obstacle_input: true
+  moving_obstacle_avoidance: true
+
+# Optional parameters for testing and debugging
+debug:
+  debug_planner: false   # Set to true to print detailed debug info
+  debug_costmaps: false  # Set to true to visualize costmaps in rviz

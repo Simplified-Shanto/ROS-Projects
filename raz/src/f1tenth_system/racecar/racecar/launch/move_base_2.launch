@@ -1,0 +1,52 @@
+<launch>
+  <arg name="rvizconfig" default="$(find racecar)/rviz/raz.rviz"/>
+  <arg name="racecar_version" default="racecar-v2" />
+  <arg name="run_camera" default="false"/>
+  <arg name="serial_port" default="/dev/ttyUSB0" />
+  <arg name="baud_rate" default="57600" />
+
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+
+    <rosparam file="$(find racecar)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find racecar)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find racecar)/config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find racecar)/config/global_costmap_params.yaml" command="load" />
+    <!-- <rosparam file="$(find racecar)/config/teb_local_planner.yaml" command="load" /> -->
+
+    <!-- <remap from="cmd_vel" to="cmd_vel"/>
+    <remap from="odom" to="base_link"/>
+    <remap from="scan" to="/scan"/> -->
+
+    <!-- Set TEB Local Planner as the planner -->
+    <!-- <param name="move_base/base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/> -->
+    
+    <!-- TEB Goal Tolerances -->
+    <!-- <param name="move_base/TEBLocalPlannerROS/yaw_goal_tolerance" value="0.1"/>
+    <param name="move_base/TEBLocalPlannerROS/xy_goal_tolerance" value="0.2"/> -->
+
+    </node>
+
+  <include file="$(find racecar)/launch/mux.launch" />
+  <include file="$(find racecar)/launch/lidar.launch" />
+  <!-- <include file="$(find racecar)/launch/imu.launch" /> -->
+
+    <!-- start electronic speed controller driver -->
+  <include file="$(find racecar)/launch/includes/$(arg racecar_version)/vesc.launch.xml" >
+    <arg name="racecar_version" value="$(arg racecar_version)" />
+  </include>
+
+  <node name="acker" pkg="racecar" type="acker.py" output="screen"/>
+
+  <include file="$(find racecar)/launch/includes/$(arg racecar_version)/static_transforms.launch.xml" />
+
+  <include file="$(find racecar)/launch/known_map_localization.launch" />
+  <node name="rviz" pkg="rviz" args="-d $(arg rvizconfig)" type="rviz" required="true"/> 
+  <node name="pure_pursuit" pkg="racecar" type="pure_pursuit.py" output="screen"/>
+
+
+
+  
+
+ 
+</launch>
