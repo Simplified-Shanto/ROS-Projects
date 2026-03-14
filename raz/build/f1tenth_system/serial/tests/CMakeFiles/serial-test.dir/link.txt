@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/serial-test.dir/unix_serial_tests.cc.o  -o /home/raz/raz/devel/lib/serial/serial-test   -L/home/raz/raz/build/gtest  -Wl,-rpath,/home/raz/raz/build/gtest:/home/raz/raz/build/gtest/lib:/home/raz/raz/devel/lib ../../../gtest/lib/libgtest.so /home/raz/raz/devel/lib/libserial.so -lutil -lpthread -lrt -lpthread 

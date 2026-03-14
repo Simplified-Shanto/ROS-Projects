@@ -1,0 +1,44 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/raz/raz/devel/include/**",
+        "/home/raz/catkin_ws/devel/include/**",
+        "/home/raz/bosch/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/raz/raz/src/f1tenth_system/racecar/ackermann_cmd_mux/include/**",
+        "/home/raz/bosch/src/plugins_pkgs/bno055_plugin/include/**",
+        "/home/raz/bosch/src/plugins_pkgs/car_plugin/include/**",
+        "/home/raz/bosch/src/plugins_pkgs/gps_plugin/include/**",
+        "/home/raz/catkin_ws/src/hector_slam/hector_geotiff/include/**",
+        "/home/raz/catkin_ws/src/hector_slam/hector_map_tools/include/**",
+        "/home/raz/catkin_ws/src/hector_slam/hector_mapping/include/**",
+        "/home/raz/catkin_ws/src/hector_slam/hector_marker_drawing/include/**",
+        "/home/raz/raz/src/f1tenth_system/hokuyo_node/include/**",
+        "/home/raz/bosch/src/plugins_pkgs/pedestrian_object_plugin/include/**",
+        "/home/raz/raz/src/f1tenth_system/serial/include/**",
+        "/home/raz/bosch/src/plugins_pkgs/traffic_light_plugin/include/**",
+        "/home/raz/catkin_ws/src/turtlebot3_simulations/turtlebot3_fake/include/**",
+        "/home/raz/catkin_ws/src/turtlebot3_simulations/turtlebot3_gazebo/include/**",
+        "/home/raz/catkin_ws/src/turtlebot3/turtlebot3_slam/include/**",
+        "/home/raz/catkin_ws/src/ros_unitree/unitree_ros/unitree_controller/include/**",
+        "/home/raz/catkin_ws/src/ros_unitree/unitree_guide/unitree_guide/include/**",
+        "/home/raz/catkin_ws/src/ros_unitree/unitree_ros/unitree_legged_control/include/**",
+        "/home/raz/raz/src/f1tenth_system/vesc/vesc_ackermann/include/**",
+        "/home/raz/raz/src/f1tenth_system/vesc/vesc_driver/include/**",
+        "/home/raz/catkin_ws/src/ros_unitree/unitree_ros/z1_controller/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

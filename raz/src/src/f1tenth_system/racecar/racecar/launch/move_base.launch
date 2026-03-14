@@ -1,0 +1,38 @@
+<launch>
+  <arg name="rvizconfig" default="$(find racecar)/racecar/rviz/raz.rviz"/>
+  <arg name="racecar_version" default="racecar-v2" />
+  <arg name="run_camera" default="false"/>
+  <arg name="serial_port" default="/dev/ttyUSB0" />
+  <arg name="baud_rate" default="57600" />
+    <include file="$(find racecar)/launch/raz.launch" />
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+
+        <rosparam file="$(find racecar)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find racecar)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find racecar)/config/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find racecar)/config/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find racecar)/config/base_local_planner_params.yaml" command="load" /> 
+
+        <remap from="cmd_vel" to="cmd_vel"/>
+        <remap from="odom" to="odom"/>
+        <remap from="scan" to="/scan"/>
+        <param name="move_base/DWAPlannerROS/yaw_goal_tolerance" value="1.0"/>
+        <param name="move_base/DWAPlannerROS/xy_goal_tolerance" value="1.0"/>    
+    </node>
+
+
+  <include file="$(find racecar)/launch/mux.launch" />
+
+    <!-- start electronic speed controller driver -->
+  <include file="$(find racecar)/launch/includes/$(arg racecar_version)/vesc.launch.xml" >
+    <arg name="racecar_version" value="$(arg racecar_version)" />
+  </include>
+
+  <node name="acker" pkg="racecar" type="acker.py" output="screen"/>
+  <node name="rviz" pkg="rviz" args="-d $(arg rvizconfig)" type="rviz" required="true"/> 
+
+
+
+ 
+</launch>

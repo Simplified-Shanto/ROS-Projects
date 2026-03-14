@@ -1,0 +1,40 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/raz/raz/devel/include/**",
+        "/home/raz/catkin_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/raz/raz/src/f1tenth_system/racecar/ackermann_cmd_mux/include/**",
+        "/home/raz/catkin_ws/src/camera/include/**",
+        "/home/raz/catkin_ws/src/find-object/include/**",
+        "/home/raz/catkin_ws/src/freenect_stack/freenect_camera/include/**",
+        "/home/raz/raz/src/hector_slam/hector_geotiff/include/**",
+        "/home/raz/raz/src/hector_slam/hector_map_tools/include/**",
+        "/home/raz/raz/src/hector_slam/hector_mapping/include/**",
+        "/home/raz/raz/src/hector_slam/hector_marker_drawing/include/**",
+        "/home/raz/catkin_ws/src/kryton_arm/include/**",
+        "/home/raz/catkin_ws/src/raz_pkg/include/**",
+        "/home/raz/catkin_ws/src/robot_kryton/include/**",
+        "/home/raz/catkin_ws/src/rosserial/rosserial_server/include/**",
+        "/home/raz/catkin_ws/src/rosserial/rosserial_test/include/**",
+        "/home/raz/catkin_ws/src/rqt_image_view/include/**",
+        "/home/raz/raz/src/f1tenth_system/serial/include/**",
+        "/home/raz/raz/src/f1tenth_system/vesc/vesc_ackermann/include/**",
+        "/home/raz/raz/src/f1tenth_system/vesc/vesc_driver/include/**",
+        "/home/raz/catkin_ws/src/view/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-arm64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

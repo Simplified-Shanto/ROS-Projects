@@ -1,0 +1,14 @@
+<!-- -*- mode: XML -*- -->
+<launch>
+  <arg name="serial_port" default="/dev/ttyUSB0" />
+  <arg name="baud_rate" default="57600" />
+  <arg name="racecar_version" default="racecar-v2" />
+
+  <node name="rosserial" pkg="rosserial_python" type="serial_node.py" output="screen">
+    <param name="port" value="$(arg serial_port)" />
+    <param name="baud" value="$(arg baud_rate)" />
+  </node>
+
+  <node name="imu_node_2" pkg="racecar" type="imu_node_2.py" output="screen"/>
+  
+</launch>

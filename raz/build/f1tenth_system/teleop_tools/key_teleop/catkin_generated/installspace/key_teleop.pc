@@ -1,0 +1,8 @@
+prefix=/home/raz/raz/install
+
+Name: key_teleop
+Description: Description of key_teleop
+Version: 0.5.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
