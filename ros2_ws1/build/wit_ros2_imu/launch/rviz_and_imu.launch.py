@@ -1,1 +1,0 @@
-/home/shanto/ros2_ws1/src/wit_ros2_imu/launch/rviz_and_imu.launch.py
