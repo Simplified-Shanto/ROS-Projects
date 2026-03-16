@@ -1,4 +1,0 @@
-[console_scripts]
-imu_tf_broadcaster = wit_ros2_imu.imu_tf_broadcaster:main
-wit_ros2_imu = wit_ros2_imu.wit_ros2_imu:main
-
