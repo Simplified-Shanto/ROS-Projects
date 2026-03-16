@@ -1,0 +1,21 @@
+[0.463s] Invoking command in '/home/shanto/ros2_ws1/src/wit_ros2_imu': PYTHONPATH=/home/shanto/ros2_ws1/build/wit_ros2_imu/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shanto/ros2_ws1/install/wit_ros2_imu/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/wit_ros2_imu build --build-base /home/shanto/ros2_ws1/build/wit_ros2_imu/build install --record /home/shanto/ros2_ws1/build/wit_ros2_imu/install.log --single-version-externally-managed install_data
+[0.639s] running egg_info
+[0.640s] writing ../../build/wit_ros2_imu/wit_ros2_imu.egg-info/PKG-INFO
+[0.640s] writing dependency_links to ../../build/wit_ros2_imu/wit_ros2_imu.egg-info/dependency_links.txt
+[0.641s] writing entry points to ../../build/wit_ros2_imu/wit_ros2_imu.egg-info/entry_points.txt
+[0.641s] writing requirements to ../../build/wit_ros2_imu/wit_ros2_imu.egg-info/requires.txt
+[0.641s] writing top-level names to ../../build/wit_ros2_imu/wit_ros2_imu.egg-info/top_level.txt
+[0.643s] reading manifest file '../../build/wit_ros2_imu/wit_ros2_imu.egg-info/SOURCES.txt'
+[0.644s] writing manifest file '../../build/wit_ros2_imu/wit_ros2_imu.egg-info/SOURCES.txt'
+[0.644s] running build
+[0.644s] running build_py
+[0.644s] running install
+[0.644s] running install_lib
+[0.645s] running install_data
+[0.645s] running install_egg_info
+[0.647s] removing '/home/shanto/ros2_ws1/install/wit_ros2_imu/lib/python3.10/site-packages/wit_ros2_imu-0.0.0-py3.10.egg-info' (and everything under it)
+[0.647s] Copying ../../build/wit_ros2_imu/wit_ros2_imu.egg-info to /home/shanto/ros2_ws1/install/wit_ros2_imu/lib/python3.10/site-packages/wit_ros2_imu-0.0.0-py3.10.egg-info
+[0.648s] running install_scripts
+[0.664s] Installing wit_ros2_imu script to /home/shanto/ros2_ws1/install/wit_ros2_imu/lib/wit_ros2_imu
+[0.664s] writing list of installed files to '/home/shanto/ros2_ws1/build/wit_ros2_imu/install.log'
+[0.683s] Invoked command in '/home/shanto/ros2_ws1/src/wit_ros2_imu' returned '0': PYTHONPATH=/home/shanto/ros2_ws1/build/wit_ros2_imu/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shanto/ros2_ws1/install/wit_ros2_imu/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/wit_ros2_imu build --build-base /home/shanto/ros2_ws1/build/wit_ros2_imu/build install --record /home/shanto/ros2_ws1/build/wit_ros2_imu/install.log --single-version-externally-managed install_data
