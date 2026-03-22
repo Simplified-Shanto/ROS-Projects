@@ -1,0 +1,30 @@
+# ROS 2 workspace build artifacts
+build/
+install/
+log/
+.colcon/
+
+# Python cache / packaging
+**/__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+.env/
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS noise
+.DS_Store
+Thumbs.db
