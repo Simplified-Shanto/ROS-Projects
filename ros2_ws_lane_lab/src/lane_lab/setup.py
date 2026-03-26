@@ -29,6 +29,8 @@ setup(
     entry_points={
         'console_scripts': [
             'mask_video_publisher = lane_lab.mask_video_publisher:main',
+            'esp32_serial_bridge = lane_lab.esp32_serial_bridge:main',
+
 
         ],
     },

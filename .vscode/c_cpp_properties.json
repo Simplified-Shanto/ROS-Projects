@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/opt/ros/humble/include/**",
+        "/home/shanto/Github/ROS-Projects/raz/src/f1tenth_system/racecar/ackermann_cmd_mux/include/**",
+        "/home/shanto/Github/ROS-Projects/raz/src/f1tenth_system/serial/include/**",
+        "/home/shanto/Github/ROS-Projects/raz/src/f1tenth_system/vesc/vesc_ackermann/include/**",
+        "/home/shanto/Github/ROS-Projects/raz/src/f1tenth_system/vesc/vesc_driver/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ros2",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
+}

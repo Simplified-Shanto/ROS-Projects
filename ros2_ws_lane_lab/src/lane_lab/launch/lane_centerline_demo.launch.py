@@ -15,7 +15,7 @@ def generate_launch_description():
             name='mask_video_publisher_node',
             output='screen',
             parameters=[{
-                'video_path': '/home/shanto/ros2_ws_lane_lab/src/lane_lab/lane_lab/data/lane_segment.mp4',
+                'video_path': '/home/shanto/Github/ROS-Projects/ros2_ws_lane_lab/src/lane_lab/lane_lab/data/lane_segment.mp4',
                 'mask_topic': '/lane/mask',
                 'fps': 10.0,
                 'loop': True,
