@@ -1,0 +1,4 @@
+[console_scripts]
+line_counter_node = wall_follower.line_counter_node:main
+wall_follower_node = wall_follower.wall_follower_node:main
+

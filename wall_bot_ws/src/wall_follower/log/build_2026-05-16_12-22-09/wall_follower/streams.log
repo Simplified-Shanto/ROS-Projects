@@ -1,0 +1,26 @@
+[1.302s] Invoking command in '/home/shanto/Github/wall_bot_ws/src/wall_follower': PYTHONPATH=/home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/wall_follower build --build-base /home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/build install --record /home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/install.log --single-version-externally-managed install_data
+[1.786s] running egg_info
+[1.787s] writing build/wall_follower/wall_follower.egg-info/PKG-INFO
+[1.788s] writing dependency_links to build/wall_follower/wall_follower.egg-info/dependency_links.txt
+[1.788s] writing entry points to build/wall_follower/wall_follower.egg-info/entry_points.txt
+[1.788s] writing requirements to build/wall_follower/wall_follower.egg-info/requires.txt
+[1.789s] writing top-level names to build/wall_follower/wall_follower.egg-info/top_level.txt
+[1.792s] reading manifest file 'build/wall_follower/wall_follower.egg-info/SOURCES.txt'
+[1.794s] writing manifest file 'build/wall_follower/wall_follower.egg-info/SOURCES.txt'
+[1.794s] running build
+[1.794s] running build_py
+[1.794s] copying wall_follower/wall_follower_node.py -> /home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/build/lib/wall_follower
+[1.795s] running install
+[1.795s] running install_lib
+[1.797s] copying /home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/build/lib/wall_follower/wall_follower_node.py -> /home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/python3.10/site-packages/wall_follower
+[1.798s] byte-compiling /home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/python3.10/site-packages/wall_follower/wall_follower_node.py to wall_follower_node.cpython-310.pyc
+[1.801s] running install_data
+[1.801s] copying launch/lap_mission.launch.py -> /home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/share/wall_follower/launch
+[1.802s] running install_egg_info
+[1.805s] removing '/home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/python3.10/site-packages/wall_follower-0.0.0-py3.10.egg-info' (and everything under it)
+[1.805s] Copying build/wall_follower/wall_follower.egg-info to /home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/python3.10/site-packages/wall_follower-0.0.0-py3.10.egg-info
+[1.807s] running install_scripts
+[1.850s] Installing line_counter_node script to /home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/wall_follower
+[1.850s] Installing wall_follower_node script to /home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/wall_follower
+[1.851s] writing list of installed files to '/home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/install.log'
+[1.894s] Invoked command in '/home/shanto/Github/wall_bot_ws/src/wall_follower' returned '0': PYTHONPATH=/home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shanto/Github/wall_bot_ws/src/wall_follower/install/wall_follower/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base build/wall_follower build --build-base /home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/build install --record /home/shanto/Github/wall_bot_ws/src/wall_follower/build/wall_follower/install.log --single-version-externally-managed install_data
