@@ -1,0 +1,17 @@
+
+# VS Code generated files
+.vscode/
+**/.vscode/
+*.vc.db
+*.vc.db-shm
+*.vc.db-wal
+
+# ROS 2 generated folders
+**/build/
+**/install/
+**/log/
+
+# ROS bags / recordings
+*.bag
+*.db3
+*.mcap
