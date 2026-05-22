@@ -1,3 +1,6 @@
+#This launch files launches Gazebo with the WRO track and the obstacles
+
+
 import os
 from launch.actions import (
     ExecuteProcess,
@@ -90,6 +93,12 @@ def generate_launch_description():
         output='screen'
     )
 
+    track_maker = Node(
+        package='wall_bot_gazebo', 
+        executable='track_maker.py', 
+        output='screen'
+    )
+
 
     return LaunchDescription([
         robot_state_publisher,
@@ -123,4 +132,5 @@ def generate_launch_description():
             ],
         )
         ),
+        track_maker, 
     ])

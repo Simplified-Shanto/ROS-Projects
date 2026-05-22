@@ -30,6 +30,9 @@ setup(
         'console_scripts': [
              'wall_follower_node = wall_follower.wall_follower_node:main',
              'line_counter_node = wall_follower.line_counter_node:main',
+             'color_detector_node = wall_follower.color_detector_node:main',
         ],
     },
 )
+
+

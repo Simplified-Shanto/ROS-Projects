@@ -1,0 +1,43 @@
+objects: true
+
+parking:
+    enabled: false
+    size: 0.3
+    pos:
+        x: 0.0
+        y: 0.0
+    angle: 0.0
+
+
+
+start:
+    pos:
+        x: 0.0
+        y: 0.0
+    angle: 0
+
+towers:
+        -   color: "Red"
+            pos:
+                x: 1.011
+                y: 0.99
+    # -   color: "Green"
+    #     pos:
+    #         x: 1.1
+    #         y: 1.5
+        -   color: "Green"
+            pos:
+                x: 0.018097
+                y: 2.011915
+    # -   color: "Red"
+    #     pos:
+    #         x: -0.5
+    #         y: 1.9
+        -   color: "Red"
+            pos:
+                x: -1.061561
+                y: 0.984212
+        -   color: "Green"
+            pos:
+                x: 0.0050
+                y: 0.022313

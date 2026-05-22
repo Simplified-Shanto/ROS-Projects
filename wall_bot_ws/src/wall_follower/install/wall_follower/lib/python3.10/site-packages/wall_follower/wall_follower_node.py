@@ -1,13 +1,22 @@
 import math
+import os
+import select
+import sys
+import termios
+import threading
 import time
+import tty
 
 import rclpy
 from rclpy.node import Node
 from rclpy.executors import ExternalShutdownException
 
 from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import TwistStamped
 from std_msgs.msg import Bool, Int32 
+
+from visualization_msgs.msg import Marker, MarkerArray
+from geometry_msgs.msg import Point 
 
 
 class WallFollower(Node):
@@ -24,7 +33,7 @@ class WallFollower(Node):
         self.declare_parameter('max_angular_speed', 1.40)
         self.declare_parameter('front_turn_distance', 0.70)
         self.declare_parameter('front_stop_distance', 0.32)
-        self.declare_parameter('wall_detect_distance', 1.50)
+        self.declare_parameter('wall_detect_distance', 1.50) #“beyond this distance, I don’t care exactly how far it is; it just means no nearby wall”
 
         self.target_distance = float(self.get_parameter('target_distance').value)
         self.linear_speed = float(self.get_parameter('linear_speed').value)
@@ -38,6 +47,14 @@ class WallFollower(Node):
 
         self.lap_completed = 0
         self.stop_commanded_time = time.time() # The time a stop command was sent from the lap completion logic 
+        self.manual_stop_requested = False
+        self.keyboard_thread = None
+        self.keyboard_fd = None
+        self.terminal_settings = None
+        self.tower_passed = 0 
+        self.state = 'FOLLOW_CENTER' # other states - STOP, AVOID_LEFT, AVOID_RIGHT
+        self.desired_gap_difference = 0.25
+
 
         self.scan_subscriber = self.create_subscription(
             LaserScan,
@@ -54,21 +71,145 @@ class WallFollower(Node):
         )
 
         self.cmd_publisher = self.create_publisher(
-            Twist,
-            '/cmd_vel',
+            TwistStamped,
+            '/ackermann_steering_controller/reference',
             10
         )
 
+        self.marker_publisher = self.create_publisher(
+            MarkerArray,  # Message type 
+            '/tower_debug_markers', # published topic 
+              10) #Queue size 
+
+        self.setup_keyboard_listener()
         self.get_logger().info('Wall follower node started.')
+        self.get_logger().info("Press Ctrl+S (or 's') to command a manual stop.")
 
 
+##################################
+#   Helper functions 
+##################################
+
+    def make_sphere_marker(self, frame_id, stamp, marker_id, x, y, z, r, g, b): 
+        marker = Marker()
+        marker.header.frame_id = frame_id 
+        marker.header.stamp = stamp
+        marker.ns = 'tower_debug'
+        marker.id = marker_id 
+        marker.type = Marker.SPHERE
+        marker.action = Marker.ADD 
+
+        marker.pose.position.x = float(x)
+        marker.pose.position.y = float(y)
+        marker.pose.position.z = float(z)
+        marker.pose.orientation.w = 1.0 
+
+        marker.scale.x = 0.025 
+        marker.scale.y = 0.025
+        marker.scale.z = 0.025
+
+        marker.color.r = float(r)
+        marker.color.g = float(g)
+        marker.color.b = float(b)
+        marker.color.a = 1.0 
+
+        marker.lifetime.sec = 0 
+        marker.lifetime.nanosec = 200000000 #0.2s 
+
+        return marker 
+    
+    def publish_tower_debug_markers(self, scan_msg, left_angle, left_range,  mid_angle, mid_range, right_angle, right_range): 
+        frame_id = scan_msg.header.frame_id 
+        stamp = scan_msg.header.stamp 
+
+        z = 0.05 
+        #here angles are in radians 
+        lx = left_range * math.cos(left_angle)
+        ly = left_range * math.sin(left_angle)
+
+        mx = mid_range * math.cos(mid_angle)
+        my = mid_range * math.sin(mid_angle)
+
+        rx = right_range * math.cos(right_angle)
+        ry = right_range * math.sin(right_angle)
+
+        markerArray = MarkerArray()
+        markerArray.markers.append(self.make_sphere_marker(frame_id, stamp,0,  lx , ly, z, 1.0, 0.0, 0.0)) # left edge = red 
+        markerArray.markers.append(self.make_sphere_marker(frame_id, stamp,1,  mx, my, z, 1.0, 1.0, 0.0))  # middle = yellow 
+        markerArray.markers.append(self.make_sphere_marker(frame_id, stamp,2, rx, ry, z, 0.0, 1.0, 0.0))  # left edge = green 
+
+        self.marker_publisher.publish(markerArray)
+   
+    def find_valley(self, scan_msg, start_angle, end_angle):
+        delta_threshold = 0.15 
+        state = 'WAIT_FALL'
+
+        left_edge = None 
+        valley_bottom = None 
+        tower_list = None # This will contain (angle_rad, distance) for the discovered towers 
+
+        prev_range = self.get_range_at_angle(scan_msg, start_angle)
+        prev_angle_rad = math.radians(start_angle)
+
+        if math.isinf(prev_range): 
+            return 
+        
+        for angle_deg in range(start_angle + 1, end_angle + 1): 
+            current_range = self.get_range_at_angle(scan_msg, angle_deg)
+            if math.isinf(current_range): 
+                continue
+
+            current_delta = current_range - prev_range
+            current_angle_rad = math.radians(angle_deg)
+
+            if state == 'WAIT_FALL': 
+                # Strong negative jump => object begins 
+                if current_delta < -delta_threshold: 
+                    left_edge = (current_angle_rad, current_range)
+                    valley_bottom = (current_angle_rad, current_range)
+                    state = 'TRACK_VALLEY'
+            
+            elif state == 'TRACK_VALLEY': 
+                # Keep the closest point as the valley bottom 
+                if valley_bottom is None or current_range < valley_bottom[1]: 
+                    valley_bottom = (current_angle_rad, current_range)
+
+                # Strong positive jump -> object ends 
+                if current_delta > delta_threshold: 
+                    right_edge = (prev_angle_rad, prev_range)
+
+                
+                    if left_edge is not None and valley_bottom is not None: 
+                         angle_span_rad = abs(right_edge[0] - left_edge[0])
+                         estimated_width = valley_bottom[1] * angle_span_rad # s = r * theta (radian) 
+                         if 0.025 <= estimated_width <= 0.09: 
+                            self.publish_tower_debug_markers(
+                                scan_msg, 
+                                left_edge[0], left_edge[1], 
+                                valley_bottom[0], valley_bottom[1], 
+                                right_edge[0], right_edge[1], 
+                            )
+                            self.get_logger().info(
+                                f"candidate width={estimated_width:.3f} m, "
+                                f"dist={valley_bottom[1]:.3f} m"
+                            )
+
+                            tower_list.append(valley_bottom[0], valley_bottom[1]) # Only storing the angle and range of the valley_bottom as a tower characteristics 
+
+                    # Reset for next valley 
+                    state = 'WAIT_FALL'
+                    left_edge = None
+                    valley_bottom = None 
+            prev_range = current_range
+            prev_angle_rad = current_angle_rad
+        return tower_list
+        
     def clamp(self, value, min_value, max_value):
         return max(min(value, max_value), min_value)
 
     def has_near_wall(self, distance):
         return not math.isinf(distance) and distance <= self.wall_detect_distance
-
-
+    
     def sanitize_distance(self, distance):
         if math.isinf(distance):
             return self.wall_detect_distance
@@ -81,6 +222,7 @@ class WallFollower(Node):
         0 degrees = front
         +90 degrees = left
         -90 degrees = right
+
         """
         angle_radians = math.radians(angle_degrees)
 
@@ -116,7 +258,7 @@ class WallFollower(Node):
             return float('inf')
 
         return min(distances)
-
+    
     def compute_corner_turn(self, front_left_distance, front_right_distance):
         opening_error = (
             self.sanitize_distance(front_left_distance)
@@ -134,38 +276,97 @@ class WallFollower(Node):
 
         return angular_z
 
+    def publish_drive_command(self, linear_x, angular_z):
+        cmd = TwistStamped()
+        cmd.header.stamp = self.get_clock().now().to_msg()
+        cmd.header.frame_id = 'base_link'
+        cmd.twist.linear.x = float(linear_x)
+        cmd.twist.angular.z = float(angular_z)
+        self.cmd_publisher.publish(cmd)
+
+    def setup_keyboard_listener(self):
+        if not sys.stdin.isatty():
+            self.get_logger().warn('Keyboard stop handler disabled: stdin is not a TTY.')
+            return
+
+        self.keyboard_fd = sys.stdin.fileno()
+        self.terminal_settings = termios.tcgetattr(self.keyboard_fd)
+        raw_settings = termios.tcgetattr(self.keyboard_fd)
+        raw_settings[0] &= ~(termios.IXON | termios.IXOFF)
+        raw_settings[3] &= ~(termios.ICANON | termios.ECHO)
+        termios.tcsetattr(self.keyboard_fd, termios.TCSANOW, raw_settings)
+
+        self.keyboard_thread = threading.Thread(
+            target=self.keyboard_listener_loop,
+            daemon=True
+        )
+        self.keyboard_thread.start()
+
+    def restore_terminal(self):
+        if self.keyboard_fd is None or self.terminal_settings is None:
+            return
+        termios.tcsetattr(self.keyboard_fd, termios.TCSANOW, self.terminal_settings)
+        self.keyboard_fd = None
+        self.terminal_settings = None
+
+    def keyboard_listener_loop(self):
+        while rclpy.ok() and not self.manual_stop_requested:
+            ready, _, _ = select.select([sys.stdin], [], [], 0.1)
+            if not ready:
+                continue
+
+            pressed_key = os.read(self.keyboard_fd, 1)
+            if pressed_key in (b'\x13', b's', b'S'):
+                self.manual_stop_requested = True
+                self.get_logger().warn('Manual stop requested from keyboard.')
+                break
+
+
+
+
+
+
+
+
     def scan_callback(self, scan_msg):
         now = time.time()
-        cmd = Twist()
+        tower_list = self.find_valley(scan_msg, -70, 70)
+        sorted_tower_list =  sorted(tower_list, key=lambda x: x[1])
+        gap_difference = 0
 
-        if self.lap_completed==0 or (self.lap_completed==1 and  now - self.stop_commanded_time < 4): 
+        if self.state!='STOP': 
+            if not sorted_tower_list and sorted_tower_list[0][1] < 1:  # If there's any tower within 1 meter range of the vehicle 
+                self.state = 'FOLLOW_CENTER'
+            else: 
+                if self.tower_passed%2==0: 
+                    self.state = 'AVOID_LEFT' 
+                    gap_difference =  self.desired_gap_difference
+                else: 
+                    self.state = 'AVOID_RIGHT'
+                    gap_difference = -self.desired_gap_difference
+                self.tower_passed+=1
 
-            front_distance = self.get_front_distance(scan_msg)
-            left_distance = self.get_range_at_angle(scan_msg, 90)
-            right_distance = self.get_range_at_angle(scan_msg, -90)
-            front_left_distance = self.get_range_at_angle(scan_msg, 45)
-            front_right_distance = self.get_range_at_angle(scan_msg, -45)
+            
+            
 
-            # Case 1: very close to the front wall, rotate decisively toward
-            # the more open corner so the robot can stay near the tunnel center.
-            if front_distance < self.front_stop_distance:
-                cmd.linear.x = 0.0
-                cmd.angular.z = self.compute_corner_turn(
-                    front_left_distance,
-                    front_right_distance
-                )
-                self.cmd_publisher.publish(cmd)
-                return
+        
+        #if self.state!='STOPPED' or (self.state=='WAITING_TO_STOP' and  now - self.stop_commanded_time < 4): 
+        front_distance = self.get_front_distance(scan_msg)
+        left_distance = self.get_range_at_angle(scan_msg, 90)
+        right_distance = self.get_range_at_angle(scan_msg, -90)
+        front_left_distance = self.get_range_at_angle(scan_msg, 45)
+        front_right_distance = self.get_range_at_angle(scan_msg, -45)
 
+        if self.state=='FOLLOW_CENTER':
             # Case 2: front wall is approaching, slow down and start the turn
             # before reaching the corner so the chassis cuts through the middle.
             if front_distance < self.front_turn_distance:
-                cmd.linear.x = float(self.turn_linear_speed)
-                cmd.angular.z = float(self.compute_corner_turn(
+                linear_x = float(self.linear_speed)
+                angular_z = float(self.compute_corner_turn(
                     front_left_distance,
                     front_right_distance
                 ))
-                self.cmd_publisher.publish(cmd)
+                self.publish_drive_command(linear_x=linear_x, angular_z=angular_z)
                 return
 
             # Case 3: tunnel following. Use both side walls when available to stay
@@ -175,7 +376,7 @@ class WallFollower(Node):
             right_visible = self.has_near_wall(right_distance)
 
             if left_visible and right_visible:
-                distance_error = left_distance - right_distance
+                distance_error = left_distance - right_distance - gap_difference
             elif right_visible:
                 distance_error = self.target_distance - right_distance
             elif left_visible:
@@ -199,20 +400,21 @@ class WallFollower(Node):
                 self.max_angular_speed
             )
 
-            steering_ratio = abs(angular_z) / self.max_angular_speed
+            linear_x = float(self.linear_speed)
+            angular_z = float(angular_z)
 
-            cmd.linear.x = float(self.clamp(
-                self.linear_speed * (1.0 - 0.50 * steering_ratio),  #0.7
-                self.turn_linear_speed,
-                self.linear_speed
-            ))
-            cmd.angular.z = float(angular_z)
-            self.cmd_publisher.publish(cmd)
-        elif self.lap_completed == 1: 
-            self.cmd_publisher.publish(cmd)
-            self.get_logger().info(f'Robot is stopped!')
-            self.lap_completed = 2 # Indicates a state where lap completion is done, stop command sending is done 
+            self.publish_drive_command(linear_x=linear_x, angular_z=angular_z)
 
+        # elif self.lap_completed == 1: 
+        #     self.publish_drive_command(linear_x=0, angular_z=0)
+        #     self.get_logger().info(f'Robot is stopped!')
+        #     self.lap_completed = 2 # Indicates a state where lap completion is done, stop command sending is done 
+        #     self.state = 'STOPPED'
+
+        if self.manual_stop_requested:
+            self.publish_drive_command(linear_x=0.0, angular_z=0.0)
+            self.state = 'STOPPED'
+            return
 
     def line_count_callback(self, msg):
 
@@ -220,6 +422,7 @@ class WallFollower(Node):
             return
         if msg.data >= 12:
             self.lap_completed = 1
+            self.state = 'WAITING_TO_STOP'
             self.stop_commanded_time = time.time()
             self.get_logger().info(f'Commanding robot to stop at line count {msg.data}.')
   
@@ -235,9 +438,18 @@ def main(args=None):
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
-        node.publish_stop()
+        # Ctrl-C can invalidate the ROS context before cleanup runs, so only
+        # publish a final stop command if the node is still allowed to talk.
+        if rclpy.ok():
+            try:
+                node.publish_drive_command(0.0, 0.0)
+                time.sleep(0.2)
+            except Exception:
+                pass
+        node.restore_terminal()
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 
 if __name__ == '__main__':
