@@ -1,0 +1,47 @@
+# ROS 2 colcon build artifacts
+build/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Editor / local tooling
+.vscode/
+.idea/
+.agents/
+.codex/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+
+# Generated TF / debugging artifacts
+frames_*.pdf
+frames_*.gv
+tf_tree.pdf
+tf_tree.gv
+
+# ROS bags and recordings
+*.db3
+*.db3-wal
+*.db3-shm
+*.mcap
+*.bag
+*.bag.active
+
+# Temporary exports / plots
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Gazebo / simulation dumps
+*.state
+*.world.sdf
+
+# Keep saved maps as project artifacts
+!maps/
+!maps/*.pgm
+!maps/*.yaml

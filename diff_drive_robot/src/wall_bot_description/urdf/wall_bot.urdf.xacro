@@ -1,0 +1,427 @@
+<?xml version="1.0"?>
+<robot name="wall_bot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ========================= -->
+  <!-- Basic dimensions -->
+  <!-- ========================= -->
+
+  <!-- Scale the original wall bot down so its footprint is close to LazyGo. -->
+  <xacro:property name="model_scale" value="0.39"/>
+
+  <xacro:property name="base_length" value="${0.45 * model_scale}"/>
+  <xacro:property name="base_width"  value="${0.30 * model_scale}"/>
+  <xacro:property name="base_height" value="${0.12 * model_scale}"/>
+
+  <xacro:property name="wheel_radius" value="${0.065 * model_scale}"/>
+  <xacro:property name="wheel_width"  value="${0.035 * model_scale}"/>
+
+  <xacro:property name="wheel_separation" value="${0.32 * model_scale}"/>
+  <xacro:property name="wheel_diameter" value="${0.13 * model_scale}"/>
+
+  <xacro:property name="base_origin_z" value="${0.12 * model_scale}"/>
+  <xacro:property name="wheel_x_offset" value="${0.10 * model_scale}"/>
+  <xacro:property name="wheel_marker_length" value="${0.035 * model_scale}"/>
+  <xacro:property name="wheel_marker_width" value="${0.002 * model_scale}"/>
+  <xacro:property name="wheel_marker_height" value="${0.018 * model_scale}"/>
+  <xacro:property name="caster_radius" value="${0.035 * model_scale}"/>
+  <xacro:property name="caster_x_offset" value="${-0.16 * model_scale}"/>
+  <xacro:property name="laser_radius" value="${0.055 * model_scale}"/>
+  <xacro:property name="laser_length" value="${0.04 * model_scale}"/>
+  <xacro:property name="laser_x_offset" value="${-0.12 * model_scale}"/>
+  <xacro:property name="laser_z_offset" value="${0.22 * model_scale}"/>
+
+
+  <xacro:property name="camera_x_offset" value="0.06"/>
+  <xacro:property name="camera_y_offset" value="0.0"/>
+  <xacro:property name="camera_z_offset" value="0.10"/>
+  <xacro:property name="camera_pitch" value="0.3"/>
+
+
+
+  <!-- ========================= -->
+  <!-- Materials -->
+  <!-- ========================= -->
+
+  <material name="orange">
+    <color rgba="1.0 0.45 0.1 1.0"/>
+  </material>
+
+  <material name="black">
+    <color rgba="0.02 0.02 0.02 1.0"/>
+  </material>
+
+  <material name="gray">
+    <color rgba="0.5 0.5 0.5 1.0"/>
+  </material>
+	
+  <material name="white"> 
+    <color rgba="1.0 1.0 1.0 1.0"/> 
+  </material> 
+  
+  <!-- ========================= -->
+  <!-- Base footprint / base link -->
+  <!-- ========================= -->
+
+  <!-- Keep an inertialess root so robot_state_publisher / KDL stay happy. -->
+  <link name="base_footprint"/>
+
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 ${base_origin_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 ${base_origin_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 ${base_origin_z}" rpy="0 0 0"/>
+      <mass value="2.0"/>
+      <inertia
+        ixx="0.03" ixy="0.0" ixz="0.0"
+        iyy="0.03" iyz="0.0"
+        izz="0.04"/>
+    </inertial>
+  </link>
+
+  <!-- ========================= -->
+  <!-- Left wheel -->
+  <!-- ========================= -->
+
+  <link name="left_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.2"/>
+      <inertia
+        ixx="0.001" ixy="0.0" ixz="0.0"
+        iyy="0.001" iyz="0.0"
+        izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel_link"/>
+    <origin xyz="${wheel_x_offset} ${wheel_separation/2} ${wheel_radius}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+  
+  <!-- Left wheel rotation marker -->
+<link name="left_wheel_marker_link">
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <box size="${wheel_marker_length} ${wheel_marker_width} ${wheel_marker_height}"/>
+    </geometry>
+    <material name="white"/>
+  </visual>
+</link>
+
+<joint name="left_wheel_marker_joint" type="fixed">
+  <parent link="left_wheel_link"/>
+  <child link="left_wheel_marker_link"/>
+  <origin xyz="${wheel_radius*0.65} ${wheel_width/2 } 0" rpy="0 0 0"/>
+</joint>
+  
+
+  <!-- ========================= -->
+  <!-- Right wheel -->
+  <!-- ========================= -->
+
+  <link name="right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.2"/>
+      <inertia
+        ixx="0.001" ixy="0.0" ixz="0.0"
+        iyy="0.001" iyz="0.0"
+        izz="0.001"/>
+    </inertial>
+  </link>
+
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel_link"/>
+    <origin xyz="${wheel_x_offset} -${wheel_separation/2} ${wheel_radius}" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+  
+  
+  <!-- Right wheel rotation marker -->
+<link name="right_wheel_marker_link">
+  <visual>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <geometry>
+      <box size="${wheel_marker_length} ${wheel_marker_width} ${wheel_marker_height}"/>
+    </geometry>
+    <material name="white"/>
+  </visual>
+</link>
+
+<joint name="right_wheel_marker_joint" type="fixed">
+  <parent link="right_wheel_link"/>
+  <child link="right_wheel_marker_link"/>
+  <origin xyz="${wheel_radius*0.65} -${wheel_width/2} 0" rpy="0 0 0"/>
+</joint>
+
+
+
+  <!-- ========================= -->
+  <!-- Caster wheel -->
+  <!-- ========================= -->
+
+  <link name="caster_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.05"/>
+      <inertia
+        ixx="0.0001" ixy="0.0" ixz="0.0"
+        iyy="0.0001" iyz="0.0"
+        izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <joint name="caster_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_link"/>
+    <origin xyz="${caster_x_offset} 0 ${caster_radius}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ========================= -->
+  <!-- LiDAR -->
+  <!-- ========================= -->
+
+  <link name="laser_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${laser_radius}" length="${laser_length}"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${laser_radius}" length="${laser_length}"/>
+      </geometry>
+    </collision>
+
+    <inertial>
+      <mass value="0.1"/>
+      <inertia
+        ixx="0.0002" ixy="0.0" ixz="0.0"
+        iyy="0.0002" iyz="0.0"
+        izz="0.0002"/>
+    </inertial>
+  </link>
+
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser_link"/>
+    <origin xyz="${laser_x_offset} 0 ${laser_z_offset}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ========================= -->
+  <!-- CAMERA -->
+  <!-- ========================= -->
+
+  <link name="camera_link">
+    <visual>
+      <geometry>
+        <box size="0.02 0.03 0.02"/>
+      </geometry>
+      <material name="gray"/>
+    </visual>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="${camera_x_offset} ${camera_y_offset} ${camera_z_offset}"
+            rpy="0 ${camera_pitch} 0"/>
+  </joint>
+
+  <link name="camera_link_optical"/>
+
+  <joint name="camera_optical_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child link="camera_link_optical"/>
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+  </joint>
+
+
+
+  <!-- ========================= -->
+  <!-- Gazebo material/friction -->
+  <!-- ========================= -->
+
+  <gazebo reference="base_link">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <gazebo reference="left_wheel_link">
+    <material>Gazebo/Black</material>
+    <mu1>20.0</mu1>
+    <mu2>20.0</mu2>
+    <slip1>0.0</slip1>
+    <slip2>0.0</slip2>
+  </gazebo>
+
+  <gazebo reference="right_wheel_link">
+    <material>Gazebo/Black</material>
+    <mu1>20.0</mu1>
+    <mu2>20.0</mu2>
+    <slip1>0.0</slip1>
+    <slip2>0.0</slip2>
+  </gazebo>
+
+  <!-- Keep the caster easy to skid so it does not fight differential turns. -->
+  <gazebo reference="caster_link">
+    <material>Gazebo/Grey</material>
+    <mu1>0.05</mu1>
+    <mu2>0.05</mu2>
+    <slip1>1.0</slip1>
+    <slip2>1.0</slip2>
+  </gazebo>
+
+  <!-- ========================= -->
+  <!-- Gazebo Sim differential drive -->
+  <!-- ========================= -->
+
+  <gazebo>
+    <plugin
+      filename="ignition-gazebo-diff-drive-system"
+      name="gz::sim::systems::DiffDrive">
+
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+
+      <wheel_separation>${wheel_separation}</wheel_separation>
+      <wheel_radius>${wheel_radius}</wheel_radius>
+
+      <odom_publish_frequency>100</odom_publish_frequency>
+
+      <topic>cmd_vel</topic>
+      <odom_topic>odom</odom_topic>
+      <tf_topic>tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+
+      <max_linear_acceleration>1.0</max_linear_acceleration>
+      <min_linear_acceleration>-1.0</min_linear_acceleration>
+      <max_angular_acceleration>3.0</max_angular_acceleration>
+      <min_angular_acceleration>-3.0</min_angular_acceleration>
+      <max_linear_velocity>1.0</max_linear_velocity>
+      <min_linear_velocity>-1.0</min_linear_velocity>
+      <max_angular_velocity>3.0</max_angular_velocity>
+      <min_angular_velocity>-3.0</min_angular_velocity>
+    </plugin>
+  </gazebo>
+
+  <!-- ========================= -->
+  <!-- Gazebo Sim joint states -->
+  <!-- ========================= -->
+
+  <gazebo>
+    <plugin
+      filename="ignition-gazebo-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher">
+      <topic>joint_states</topic>
+      <joint_name>left_wheel_joint</joint_name>
+      <joint_name>right_wheel_joint</joint_name>
+    </plugin>
+  </gazebo>
+
+  <!-- ========================= -->
+  <!-- Gazebo Sim LiDAR -->
+  <!-- ========================= -->
+
+  <gazebo reference="laser_link">
+    <sensor name="lidar_sensor" type="gpu_lidar">
+      <topic>scan</topic>
+      <update_rate>10</update_rate>
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+
+      <lidar>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+
+        <range>
+          <min>0.12</min>
+          <max>8.0</max>
+          <resolution>0.01</resolution>
+        </range>
+
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </lidar>
+    </sensor>
+  </gazebo>
+
+</robot>
